@@ -1,0 +1,127 @@
+    Urutan ALur
+
+    main 
+    handler
+    service 
+    repository
+    db 
+    mysql
+    
+    
+    // Auto migration
+	 db.AutoMigrate(&book.Book{})
+
+	//CRUD
+
+	//Create
+	var book book.Book
+
+	book.Title = "Man Tiger"
+	book.Description = "Ini adalah Film Man Tiger"
+	book.Price = 90000
+	book.Rating = 100
+	book.Discount = 10
+
+	err = db.Create(&book).Error
+	if err != nil {
+		fmt.Println("Error Creating book")
+	}
+
+	//Read
+
+	var book book.Book
+
+	// err = db.Debug().First(&book).Error // Get By Last
+	err = db.Debug().First(&book, 1).Error // Get By id
+	if err != nil {
+		fmt.Println("Error Read First book")
+	}
+
+	fmt.Println("Output Title : ", book.Title)
+	fmt.Println("Output Price : ", book.Price)
+	fmt.Println("Output Rating : ", book.Rating)
+	fmt.Println("Output Description", book.Description)
+
+	// READ MANY DATA
+	var books []book.Book
+	// err = db.Debug().Find(&books, 1).Error // GET data ROWS
+	err = db.Debug().Where("title = ?", "Man Tiger").Find(&books).Error // GET data ROWS WHERE
+	if err != nil {
+		fmt.Println("Error Read First book")
+	}
+	for _, b := range books {
+		fmt.Println("Output Book : ", b.Title)
+	}
+
+	//UPDATE DATA
+	var book book.Book
+
+	err = db.Debug().Where("id = ?", 1).First(&book).Error // Get By id
+	if err != nil {
+		fmt.Println("Error Read First book")
+	}
+
+	book.Title = "Manusia Biasa"
+
+	err = db.Save(&book).Error
+	if err != nil {
+		fmt.Println("Error Update  book")
+	}
+
+	// DELETE
+	var book book.Book
+
+	err = db.Debug().Where("id = ?", 1).First(&book).Error // Get By id
+	if err != nil {
+		fmt.Println("Error Read First book")
+	}
+
+	err = db.Delete(&book).Error
+	if err != nil {
+		fmt.Println("Error Delete book")
+	}
+
+
+    ==========================
+            REPOSITORY => Database
+    ==========================
+
+    	//Instan Connect Repository
+	// bookRepository := book.NewRepository(db)
+
+	// READ ROWS REPOSITORY
+	// books, err := bookRepository.FindAll()
+	// for _, i := range books {
+	// 	fmt.Println(i.Title, i.Discount, i.Description)
+	// }
+
+	// READ BY ID REPOSITORY
+	// book, err := bookRepository.FindById(2)
+	// for _, i := range books {
+	// fmt.Println(book.Title, book.Discount, book.Description)
+	// }
+
+	// CREATE REPOSITORY
+	// bok := book.Book{
+	// 	Title:       "Man Tiger 2",
+	// 	Description: "Ini adalah Film Man Tiger 2",
+	// 	Price:       900002,
+	// 	Rating:      1001,
+	// 	Discount:    1012,
+	// }
+	// bookRepository.Create(bok)
+
+    ===========================
+            SERVICE => bisnis Logic
+    ===========================
+
+    bookRepository := book.NewRepository(db)
+
+	bookService := book.NewService(bookRepository)
+
+	bookRequest := book.BookRequest{
+		Title: "Man Tiger 3",
+		Price: 900003,
+	}
+
+	bookService.Create(bookRequest)

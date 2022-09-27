@@ -43,59 +43,21 @@ func main() {
 
 	}
 	fmt.Println("Database Connected")
+	db.AutoMigrate(&book.Book{})
 
-	// Auto migration
-	// db.AutoMigrate(&book.Book{})
+	bookRepository := book.NewRepository(db)
 
-	//CRUD
+	bookService := book.NewService(bookRepository)
 
-	///Create
-	// book := book.Book{}
-	// book.Title = "Man Tiger"
-	// book.Price = 90000
-	// book.Rating = 101
-	// book.Description = "Ini adalah Film Man Tiger"
-
-	// err = db.Create(&book).Error
-	// if err != nil {
-	// 	fmt.Println("Error Creating book")
-	// }
-
-	// Read
-
-	// var book book.Book
-
-	// // err = db.Debug().First(&book).Error // Get By Last
-	// err = db.Debug().First(&book, 1).Error // Get By id
-	// if err != nil {
-	// 	fmt.Println("Error Read First book")
-	// }
-
-	// fmt.Println("Output Title : ", book.Title)
-	// fmt.Println("Output Price : ", book.Price)
-	// fmt.Println("Output Rating : ", book.Rating)
-	// fmt.Println("Output Description", book.Description)
-
-	var books []book.Book
-
-	// err = db.Debug().Find(&books, 1).Error // GET data ROWS
-	err = db.Debug().Where("title = ?", "Man Tiger").Find(&books).Error // GET data ROWS WHERE
-	if err != nil {
-		fmt.Println("Error Read First book")
-	}
-
-	for _, b := range books {
-		fmt.Println("Output Book : ", b.Title)
-
-	}
+	bookHandler := handler.NewBookHandler(bookService)
 
 	//Versioning API
 	v1 := gin.Default()
-	v1.GET("/", handler.RootHandler)
-	v1.GET("/hello", handler.HelloHandler)
-	v1.GET("/books/:id/:title", handler.BookHandler)
-	v1.GET("/query", handler.QueryHandler)
-	v1.POST("/books", handler.PostbookHandler)
+	v1.GET("/", bookHandler.RootHandler)
+	v1.GET("/hello", bookHandler.HelloHandler)
+	v1.GET("/books/:id/:title", bookHandler.BooksHandler)
+	v1.GET("/query", bookHandler.QueryHandler)
+	v1.POST("/books", bookHandler.PostbookHandler)
 
 	v1.Run()
 
