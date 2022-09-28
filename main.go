@@ -47,17 +47,19 @@ func main() {
 
 	bookRepository := book.NewRepository(db)
 
+	// bookFilrepository := book.NewFileRepository()
+
 	bookService := book.NewService(bookRepository)
 
 	bookHandler := handler.NewBookHandler(bookService)
 
 	//Versioning API
 	v1 := gin.Default()
-	v1.GET("/", bookHandler.RootHandler)
-	v1.GET("/hello", bookHandler.HelloHandler)
-	v1.GET("/books/:id/:title", bookHandler.BooksHandler)
-	v1.GET("/query", bookHandler.QueryHandler)
-	v1.POST("/books", bookHandler.PostbookHandler)
+
+	v1.GET("/books", bookHandler.GetBooks)
+	v1.GET("/books/:id", bookHandler.GetBook)
+	v1.POST("/books", bookHandler.CreateBook)
+	v1.PUT("/books/:id", bookHandler.UpdateBook)
 
 	v1.Run()
 
